@@ -41,8 +41,20 @@ import {
   AppKit,
 } from "@cocos-labs/web3modal-ethers5";
 import { createWalletClient, custom, WalletClient } from "viem";
-import { mainnet } from "viem/chains";
+import { connect, createConfig, getAccount, http, injected } from "@wagmi/core";
+import { mainnet, sepolia } from "@wagmi/core/chains";
 const { ccclass, property } = _decorator;
+
+export const config = createConfig({
+  chains: [mainnet, sepolia],
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+  },
+  connectors: [injected({ target: "metaMask" })],
+});
+
+export let account = getAccount(config);
 
 export interface TonAddressConfig {
   tonAddress: string;
@@ -260,30 +272,8 @@ export class FlappyBirdLite extends GameBase {
   }
 
   private async updateWalletAddress() {
-    let provider = window.ethereum! as any;
-
-    if (typeof window.okxwallet !== "undefined") {
-      provider = window.okxwallet!;
-    }
-
-    if (
-      typeof window.bitkeep !== "undefined" &&
-      window.bitkeep.ethereum !== "undefined"
-    ) {
-      provider = window.bitkeep!.ethereum;
-    }
-
-    this._evmWalletClient = createWalletClient({
-      chain: mainnet,
-      transport: custom(provider as any),
-    });
-    const addresses = await this._evmWalletClient.requestAddresses();
-    if (addresses.length > 0) {
-      this.evmConnectLabel.string = addresses[0].slice(-6);
-      await this._evmWalletClient.signMessage({
-        message: "Hello, this is cocos game message.",
-        account: addresses[0],
-      });
+    if (account.address) {
+      this.evmConnectLabel.string = account.address.slice(-6);
     } else {
       this.evmConnectLabel.string = "Connect";
     }
@@ -299,14 +289,10 @@ export class FlappyBirdLite extends GameBase {
     }
   }
 
-  public evmConnect() {
-    if (
-      typeof window.ethereum === "undefined" &&
-      typeof window.okxwallet === "undefined" &&
-      typeof window.bitkeep === "undefined"
-    ) {
-      globalEvent.emit(GameEvents.WALLET_SHOW);
-      return;
+  public async evmConnect() {
+    if (!account.isConnected) {
+      await connect(config, { connector: injected({ target: "metaMask" }) });
+      account = getAccount(config);
     }
 
     this.updateWalletAddress();
