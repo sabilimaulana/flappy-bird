@@ -40,8 +40,8 @@
   "general": {
     "designResolution": {
       "fitHeight": false,
-      "fitWidth": false,
-      "width": 640,
+      "fitWidth": true,
+      "width": 400,
       "height": 920
     }
   },
