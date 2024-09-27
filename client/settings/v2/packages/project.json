@@ -39,10 +39,10 @@
   },
   "general": {
     "designResolution": {
-      "fitHeight": true,
+      "fitHeight": false,
       "fitWidth": false,
-      "width": 720,
-      "height": 1000
+      "width": 640,
+      "height": 920
     }
   },
   "script": {
