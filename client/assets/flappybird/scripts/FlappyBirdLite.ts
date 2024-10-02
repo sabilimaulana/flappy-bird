@@ -305,10 +305,9 @@ export class FlappyBirdLite extends GameBase {
   }
 
   public gameStartBtnClicked() {
-    const user = TelegramWebApp.Instance.getTelegramUser();
-    const initData = TelegramWebApp.Instance.getTelegramInitData();
+    const webAppInitData = TelegramWebApp.Instance.getTelegramWebAppInitData();
 
-    alert(JSON.stringify({ user, initData }));
+    alert(JSON.stringify({ webAppInitData }));
 
     // TODO
     // this.countDownGame();
